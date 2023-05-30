@@ -25,7 +25,8 @@ class ListBar extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(left: 10.0),
             child: Image.asset(
-              'assets/circle.png',
+              'assets/icons/circle.png',
+              // E:\Taba\flutter\todo_list\assets\icons\circle.png
               width: 16,
               height: 16,
             ),
