@@ -13,7 +13,7 @@ class todoList extends StatefulWidget {
 class _todoListState extends State<todoList> {
   String? title, description;
   DateTime? todoDate;
-  TimeOfDay? todoTime;
+
   List<Todo> _todolist = [];
   List<Todo>? _searchTodolist;
 
@@ -255,7 +255,7 @@ class _todoListState extends State<todoList> {
         hintStyle: GoogleFonts.lato(
           fontWeight: FontWeight.w400,
           fontSize: 18,
-          color: Color(0xffFFFFFF).withOpacity(0.87),
+          color: Color(0xffFFFFFF).withOpacity(0.50),
         ),
         focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Color(0xff979797))),
@@ -286,7 +286,7 @@ class _todoListState extends State<todoList> {
   //Start
   void _sendButton() {
     if (title != null && description != null && todoDate != null) {
-      _addTodoItem(title!, description!, todoDate!, todoTime!);
+      _addTodoItem(title!, description!, todoDate!);
       Navigator.pop(context);
     }
   }
@@ -300,22 +300,30 @@ class _todoListState extends State<todoList> {
         initialDate: DateTime.now(),
         firstDate: DateTime.now(),
         lastDate: DateTime(2099));
-    todoTime =
+    TimeOfDay? todoTime =
         await showTimePicker(context: context, initialTime: TimeOfDay.now());
+    if (todoTime != null) {
+      setState(() {
+        todoDate = DateTime(todoDate!.year, todoDate!.month, todoDate!.day,
+            todoTime.hour, todoTime.minute);
+      });
+    }
   }
   //End
 
   //Add Items in Todo List which is initialize Globally in class
   // Start
   void _addTodoItem(
-      String title, String description, DateTime todoDate, TimeOfDay todoTime) {
+    String title,
+    String description,
+    DateTime todoDate,
+  ) {
     setState(() {
       _todolist.add(
         Todo(
           title: title,
           description: description,
           todoDate: todoDate,
-          todoTime: todoTime,
         ),
       );
     });

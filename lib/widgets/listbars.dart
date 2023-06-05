@@ -2,14 +2,21 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:todo_list/models/listforTodo.dart';
 
-class ListBar extends StatelessWidget {
+class ListBar extends StatefulWidget {
   final Todo listTodo;
 
   ListBar({
     required this.listTodo,
   });
+
+  @override
+  State<ListBar> createState() => _ListBarState();
+}
+
+class _ListBarState extends State<ListBar> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -24,20 +31,27 @@ class ListBar extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.only(left: 10.0),
-            child: Image.asset(
-              'assets/icons/circle.png',
-              width: 16,
-              height: 16,
-            ),
+            child: Checkbox(
+                checkColor: Color(0xff363636),
+                activeColor: Colors.white,
+                shape: CircleBorder(),
+                side: BorderSide(
+                    width: 1.5, color: Color(0x0fffffff).withOpacity(0.87)),
+                value: widget.listTodo.isComplete,
+                onChanged: (bool? value) {
+                  setState(() {
+                    widget.listTodo.isComplete = value!;
+                  });
+                }),
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 12, top: 12, bottom: 12),
+            padding: const EdgeInsets.only(top: 12, bottom: 12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '${listTodo.title}',
+                  widget.listTodo.title,
                   style: GoogleFonts.lato(
                     fontSize: 16,
                     fontStyle: FontStyle.normal,
@@ -46,7 +60,9 @@ class ListBar extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '${listTodo.todoDate.day}-${listTodo.todoDate.month}-${listTodo.todoDate.year} ${listTodo.todoTime.hour}:${listTodo.todoTime.minute}',
+                  // '${DateFormat.yMMMEd().format(now);}',
+                  DateFormat('E, MMM dd yyyy  HH:mm')
+                      .format(widget.listTodo.todoDate),
                   style: GoogleFonts.lato(
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
