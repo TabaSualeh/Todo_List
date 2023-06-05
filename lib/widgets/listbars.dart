@@ -26,7 +26,6 @@ class ListBar extends StatelessWidget {
             padding: const EdgeInsets.only(left: 10.0),
             child: Image.asset(
               'assets/icons/circle.png',
-              // E:\Taba\flutter\todo_list\assets\icons\circle.png
               width: 16,
               height: 16,
             ),
@@ -47,7 +46,7 @@ class ListBar extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '${listTodo.todoTime}',
+                  '${listTodo.todoDate.day}-${listTodo.todoDate.month}-${listTodo.todoDate.year} ${listTodo.todoTime.hour}:${listTodo.todoTime.minute}',
                   style: GoogleFonts.lato(
                     fontSize: 14,
                     fontWeight: FontWeight.w400,

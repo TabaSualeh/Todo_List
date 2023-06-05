@@ -34,13 +34,15 @@ class _loginState extends State<login> {
                   // User name Text Field
                   Padding(
                     padding: const EdgeInsets.only(top: 8.0, bottom: 25),
-                    child: _showTextField("Enter your Username...", false),
+                    child: _showTextField(
+                        "Enter your Username...", false, TextInputAction.next),
                   ),
                   // Password TextField
                   _displayText("Password"),
                   Padding(
                     padding: const EdgeInsets.only(top: 8.0, bottom: 69),
-                    child: _showTextField("Enter your Password...", true),
+                    child: _showTextField(
+                        "Enter your Password...", true, TextInputAction.done),
                   ),
                   MyButton(
                       btnName: 'Login',
@@ -60,8 +62,10 @@ class _loginState extends State<login> {
 
   //   FUNCTIONS
 
-  TextField _showTextField(String TextHint, bool HiddenData) {
+  TextField _showTextField(
+      String TextHint, bool HiddenData, TextInputAction moveToNextTextField) {
     return TextField(
+      textInputAction: moveToNextTextField,
       obscureText: HiddenData,
       cursorColor: const Color(0xff979797),
       style: GoogleFonts.lato(
