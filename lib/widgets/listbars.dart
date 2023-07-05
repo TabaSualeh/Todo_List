@@ -60,8 +60,7 @@ class _ListBarState extends State<ListBar> {
                   ),
                 ),
                 Text(
-                  // '${DateFormat.yMMMEd().format(now);}',
-                  DateFormat('E, MMM dd yyyy  HH:mm')
+                  DateFormat('E, MMM dd yyyy  hh:mm')
                       .format(widget.listTodo.todoDate),
                   style: GoogleFonts.lato(
                     fontSize: 14,

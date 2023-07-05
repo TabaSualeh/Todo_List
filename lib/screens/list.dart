@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:todo_list/controller/todoContoller.dart';
 import 'package:todo_list/widgets/listbars.dart';
 import '../models/listforTodo.dart';
 
@@ -13,9 +14,8 @@ class todoList extends StatefulWidget {
 class _todoListState extends State<todoList> {
   String? title, description;
   DateTime? todoDate;
-
-  List<Todo> _todolist = [];
-  List<Todo>? _searchTodolist;
+  //object of ControllerTodo
+  ControllerTodo tController = ControllerTodo();
 
   @override
   void initState() {
@@ -40,8 +40,36 @@ class _todoListState extends State<todoList> {
         children: [
           Padding(
               padding: const EdgeInsets.only(
-                  top: 27.0, bottom: 67, left: 24, right: 24),
-              child: _showSearchField()),
+                  top: 27.0, bottom: 20, left: 24, right: 24),
+              child: tController.todolist.isEmpty
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image(
+                          image: AssetImage("assets/icons/checkList.png"),
+                          width: 227,
+                          height: 227,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10, bottom: 10),
+                          child: Text(
+                            "What do you want to do Today?",
+                            style: GoogleFonts.lato(
+                                fontWeight: FontWeight.w400,
+                                fontSize: 20,
+                                color: Color(0xffFFFFFF).withOpacity(0.87)),
+                          ),
+                        ),
+                        Text(
+                          "Tap + to add your tasks",
+                          style: GoogleFonts.lato(
+                              fontWeight: FontWeight.w400,
+                              fontSize: 16,
+                              color: Color(0xffFFFFFF).withOpacity(0.87)),
+                        )
+                      ],
+                    )
+                  : _showSearchField()),
           SizedBox(
             height: 10,
           ),
@@ -49,15 +77,16 @@ class _todoListState extends State<todoList> {
             child: Padding(
               padding: const EdgeInsets.only(bottom: 74.0),
               child: ListView.builder(
+                  physics: BouncingScrollPhysics(),
                   itemBuilder: ((context, index) {
-                    Todo item = _searchTodolist != null
-                        ? _searchTodolist![index]
-                        : _todolist[index];
+                    Todo item = tController.searchTodolist != null
+                        ? tController.searchTodolist![index]
+                        : tController.todolist[index];
                     return ListBar(listTodo: item);
                   }),
-                  itemCount: _searchTodolist != null
-                      ? _searchTodolist!.length
-                      : _todolist.length),
+                  itemCount: tController.searchTodolist != null
+                      ? tController.searchTodolist!.length
+                      : tController.todolist.length),
             ),
           ),
         ],
@@ -107,7 +136,11 @@ class _todoListState extends State<todoList> {
         fontSize: 16,
         color: const Color(0xffFFFFFF),
       ),
-      onChanged: _searchTodo,
+      onChanged: (value) {
+        setState(() {
+          tController.searchTodo(value);
+        });
+      },
       decoration: InputDecoration(
         prefixIcon: Padding(
           padding: const EdgeInsets.all(13.5),
@@ -134,26 +167,7 @@ class _todoListState extends State<todoList> {
   }
   //     End
 
-  //Search with a Keyword Function
-  //Start
-  void _searchTodo(String searchKey) {
-    if (searchKey.isEmpty) {
-      setState(() {
-        _searchTodolist = null;
-      });
-    } else {
-      List<Todo> results = _todolist
-          .where((element) =>
-              element.title.toLowerCase().contains(searchKey.toLowerCase()))
-          .toList();
-      setState(() {
-        _searchTodolist = results;
-      });
-    }
-  }
-  //End
-
-  //Bottom Sheet for Add Task in Todo
+  //Bottom Sheet for Add Task in Todos
   //  Start
   void _showAddTaskSheet() {
     showModalBottomSheet(
@@ -212,7 +226,8 @@ class _todoListState extends State<todoList> {
                 Spacer(),
                 _iconsInBottomSheet(
                     imageName: 'send',
-                    onPressedFunction: _sendButton,
+                    onPressedFunction: () => tController.sendButton(
+                        title!, description!, todoDate!, context),
                     BorderColor: Color(0xff8687E7))
               ],
             ),
@@ -282,24 +297,14 @@ class _todoListState extends State<todoList> {
   }
   //End
 
-  // Send Icon On Pressed Function
-  //Start
-  void _sendButton() {
-    if (title != null && description != null && todoDate != null) {
-      _addTodoItem(title!, description!, todoDate!);
-      Navigator.pop(context);
-    }
-  }
-  //End
-
   //Select Date Time Together for Todo
   //Start
   void _selectDateTimeTogether() async {
-    todoDate = await showDatePicker(
+    todoDate = (await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
         firstDate: DateTime.now(),
-        lastDate: DateTime(2099));
+        lastDate: DateTime(2099)))!;
     TimeOfDay? todoTime =
         await showTimePicker(context: context, initialTime: TimeOfDay.now());
     if (todoTime != null) {
@@ -308,25 +313,6 @@ class _todoListState extends State<todoList> {
             todoTime.hour, todoTime.minute);
       });
     }
-  }
-  //End
-
-  //Add Items in Todo List which is initialize Globally in class
-  // Start
-  void _addTodoItem(
-    String title,
-    String description,
-    DateTime todoDate,
-  ) {
-    setState(() {
-      _todolist.add(
-        Todo(
-          title: title,
-          description: description,
-          todoDate: todoDate,
-        ),
-      );
-    });
   }
   //End
 
