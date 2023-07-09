@@ -3,8 +3,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:todo_list/controller/todoContoller.dart';
-import 'package:todo_list/widgets/listbars.dart';
-import '../models/listforTodo.dart';
+import 'package:todo_list/widgets/AppBar.dart';
+import 'package:todo_list/widgets/BuilderTodoBar.dart';
+import 'package:todo_list/widgets/EmptyImage.dart';
+import 'package:todo_list/widgets/searchBar.dart';
+import '../widgets/AddTaskSheet.dart';
+import '../widgets/IconsInBottomSheet.dart';
 
 class todoList extends StatefulWidget {
   @override
@@ -16,21 +20,22 @@ class _todoListState extends State<todoList> {
   DateTime? todoDate;
   //object of ControllerTodo
   ControllerTodo tController = ControllerTodo();
+  CustomAppBar myAppBar = CustomAppBar();
 
   @override
   void initState() {
     super.initState();
   }
 
+  void state() => setState(() {});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xff121212),
-      appBar: _showAppBar(),
+      appBar: myAppBar.showAppBar(),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _showAddTaskSheet();
-        },
+        onPressed: () => showAddTaskSheet(context: context),
         backgroundColor: Color(0xff8687E7),
         child: Icon(
           Icons.add,
@@ -39,54 +44,22 @@ class _todoListState extends State<todoList> {
       body: Column(
         children: [
           Padding(
-              padding: const EdgeInsets.only(
-                  top: 27.0, bottom: 20, left: 24, right: 24),
-              child: tController.todolist.isEmpty
-                  ? Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image(
-                          image: AssetImage("assets/icons/checkList.png"),
-                          width: 227,
-                          height: 227,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 10, bottom: 10),
-                          child: Text(
-                            "What do you want to do Today?",
-                            style: GoogleFonts.lato(
-                                fontWeight: FontWeight.w400,
-                                fontSize: 20,
-                                color: Color(0xffFFFFFF).withOpacity(0.87)),
-                          ),
-                        ),
-                        Text(
-                          "Tap + to add your tasks",
-                          style: GoogleFonts.lato(
-                              fontWeight: FontWeight.w400,
-                              fontSize: 16,
-                              color: Color(0xffFFFFFF).withOpacity(0.87)),
-                        )
-                      ],
-                    )
-                  : _showSearchField()),
+            padding: const EdgeInsets.only(
+                top: 27.0, bottom: 20, left: 24, right: 24),
+            child: tController.todolist.isEmpty
+                ? imageOnEmpty()
+                : searchBar(
+                    tController: tController,
+                    state: state,
+                  ),
+          ),
           SizedBox(
             height: 10,
           ),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.only(bottom: 74.0),
-              child: ListView.builder(
-                  physics: BouncingScrollPhysics(),
-                  itemBuilder: ((context, index) {
-                    Todo item = tController.searchTodolist != null
-                        ? tController.searchTodolist![index]
-                        : tController.todolist[index];
-                    return ListBar(listTodo: item);
-                  }),
-                  itemCount: tController.searchTodolist != null
-                      ? tController.searchTodolist!.length
-                      : tController.todolist.length),
+              child: BuilderTodoBar(tController: tController),
             ),
           ),
         ],
@@ -94,149 +67,76 @@ class _todoListState extends State<todoList> {
     );
   }
 
-  // Appbar Function
-  //     Start
-  AppBar _showAppBar() {
-    return AppBar(
-      centerTitle: true,
-      backgroundColor: Color(0xff121212),
-      leading: Padding(
-        padding: const EdgeInsets.only(left: 33),
-        child: Image.asset('assets/icons/sort.png'),
-      ),
-      title: Text(
-        'Todo',
-        style: GoogleFonts.lato(
-          fontWeight: FontWeight.w400,
-          fontSize: 20,
-          color: Color(0xffFFFFFF),
-        ),
-      ),
-      actions: [
-        Padding(
-          padding: const EdgeInsets.only(right: 24.0),
-          child: Image.asset(
-            'assets/user.png',
-            height: 42,
-            width: 42,
-          ),
-        )
-      ],
-    );
-  }
-  //    End
+  // //Bottom Sheet for Add Task in Todos
+  // //  Start
+  // void _showAddTaskSheet() {
+  //   showModalBottomSheet(
+  //       isScrollControlled: true,
+  //       context: context,
+  //       shape: RoundedRectangleBorder(
+  //           borderRadius: BorderRadius.vertical(top: Radius.circular(30))),
+  //       builder: (context) {
+  //         return showBottomSheet();
+  //       });
+  // }
+  // // End
 
-  // Search Function
-  //     Start
-  TextField _showSearchField() {
-    return TextField(
-      cursorColor: const Color(0xff979797),
-      style: GoogleFonts.lato(
-        fontWeight: FontWeight.w400,
-        fontSize: 16,
-        color: const Color(0xffFFFFFF),
-      ),
-      onChanged: (value) {
-        setState(() {
-          tController.searchTodo(value);
-        });
-      },
-      decoration: InputDecoration(
-        prefixIcon: Padding(
-          padding: const EdgeInsets.all(13.5),
-          child: Image.asset(
-            'assets/icons/search.png',
-            height: 20.5,
-            width: 20.5,
-          ),
-        ),
-        fillColor: Color(0xff1D1D1D),
-        filled: true,
-        hintText: "Search for your task...",
-        hintStyle: GoogleFonts.lato(
-          fontWeight: FontWeight.w400,
-          fontSize: 16,
-          color: const Color(0xffAFAFAF),
-        ),
-        focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Color(0xff979797))),
-        enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Color(0xff979797))),
-      ),
-    );
-  }
-  //     End
-
-  //Bottom Sheet for Add Task in Todos
-  //  Start
-  void _showAddTaskSheet() {
-    showModalBottomSheet(
-        isScrollControlled: true,
-        context: context,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(30))),
-        builder: (context) {
-          return _showBottomSheet();
-        });
-  }
-  // End
-
-  // Bottom Sheet Function
-  //     Start
-  Container _showBottomSheet() {
-    return Container(
-      color: Color(0xff363636),
-      padding: EdgeInsets.fromLTRB(
-          25, 25, 25, MediaQuery.of(context).viewInsets.bottom),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 16.0),
-            child: Text(
-              "Add Task",
-              style: GoogleFonts.lato(
-                fontWeight: FontWeight.w700,
-                fontSize: 20,
-                color: Color(0xffFFFFFF),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 12.0),
-            child: _showTextFieldinBottom("Add Title", true),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 22.25),
-            child: _showTextFieldinBottom("Add Description", false),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 17.0),
-            child: Row(
-              children: [
-                _iconsInBottomSheet(
-                    imageName: 'timer',
-                    onPressedFunction: _selectDateTimeTogether,
-                    opacity: 0.87),
-                _iconsInBottomSheet(
-                    imageName: 'tag', onPressedFunction: () {}, opacity: 0.87),
-                _iconsInBottomSheet(
-                    imageName: 'flag', onPressedFunction: () {}, opacity: 0.87),
-                Spacer(),
-                _iconsInBottomSheet(
-                    imageName: 'send',
-                    onPressedFunction: () => tController.sendButton(
-                        title!, description!, todoDate!, context),
-                    BorderColor: Color(0xff8687E7))
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-  //End
+  // // Bottom Sheet Function
+  // //     Start
+  // Container showBottomSheet() {
+  //   return Container(
+  //     color: Color(0xff363636),
+  //     padding: EdgeInsets.fromLTRB(
+  //         25, 25, 25, MediaQuery.of(context).viewInsets.bottom),
+  //     child: Column(
+  //       mainAxisSize: MainAxisSize.min,
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         Padding(
+  //           padding: const EdgeInsets.only(bottom: 16.0),
+  //           child: Text(
+  //             "Add Task",
+  //             style: GoogleFonts.lato(
+  //               fontWeight: FontWeight.w700,
+  //               fontSize: 20,
+  //               color: Color(0xffFFFFFF),
+  //             ),
+  //           ),
+  //         ),
+  //         Padding(
+  //           padding: const EdgeInsets.only(bottom: 12.0),
+  //           child: _showTextFieldinBottom("Add Title", true),
+  //         ),
+  //         Padding(
+  //           padding: const EdgeInsets.only(bottom: 22.25),
+  //           child: _showTextFieldinBottom("Add Description", false),
+  //         ),
+  //         Padding(
+  //           padding: const EdgeInsets.only(bottom: 17.0),
+  //           child: Row(
+  //             children: [
+  //               IconsInBottomSheet(
+  //                   imageName: 'timer',
+  //                   onPressedFunction: _selectDateTimeTogether,
+  //                   opacity: 0.87),
+  //               IconsInBottomSheet(
+  //                   imageName: 'tag', onPressedFunction: () {}, opacity: 0.87),
+  //               IconsInBottomSheet(
+  //                   imageName: 'flag', onPressedFunction: () {}, opacity: 0.87),
+  //               Spacer(),
+  //               IconsInBottomSheet(
+  //                   imageName: 'send',
+  //                   onPressedFunction: () => tController.sendButton(
+  //                       title!, description!, todoDate!, context),
+  //                   BorderColor: Color(0xff8687E7))
+  //             ],
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+  // //End
 
   // TextFields Present in Bottom Sheets
   //Start
@@ -278,22 +178,6 @@ class _todoListState extends State<todoList> {
             borderSide: BorderSide(color: Color(0xff979797))),
       ),
     );
-  }
-  //End
-
-  // Icon Buttons in Todo Bottom Sheet
-  //Start
-  IconButton _iconsInBottomSheet(
-      {required String imageName,
-      VoidCallback? onPressedFunction,
-      Color BorderColor = const Color(0xffFFFFFF),
-      double? opacity = 1.0}) {
-    return IconButton(
-        onPressed: onPressedFunction,
-        icon: ImageIcon(
-          AssetImage("assets/icons/$imageName.png"),
-          color: BorderColor.withOpacity(opacity!),
-        ));
   }
   //End
 

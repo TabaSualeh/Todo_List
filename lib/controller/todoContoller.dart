@@ -41,7 +41,7 @@ class ControllerTodo {
   //Start
   void sendButton(String title, String description, DateTime todoDate,
       BuildContext context) {
-    if (title.isNotEmpty && description.isNotEmpty && todoDate != null) {
+    if (title.isNotEmpty && description.isNotEmpty) {
       addTodoItem(title, description, todoDate, context);
     }
   }
